@@ -1,0 +1,18 @@
+am:
+  replicaCount: 1
+ds_cts:
+  replicaCount: 1
+idm:
+  replicaCount: 1
+ds_idrepo:
+  replicaCount: 1
+ig:
+  replicaCount: 1
+platform:
+  ingress:
+    hosts:
+    - forgeops.example.com
+    tls:
+      issuer:
+        kind: ClusterIssuer
+        name: default-issuer
