@@ -585,3 +585,125 @@ tmp@tmplab:~/forgeops$ git commit -m "./forgeops env --env-name dev --fqdn forge
  create mode 100644 kustomize/overlay/dev/login-ui/ingress-fqdn.yaml
  create mode 100644 kustomize/overlay/dev/login-ui/kustomization.yaml
  create mode 100644 kustomize/overlay/dev/secrets/kustomization.yaml
+tmp@tmplab:~/forgeops$ kubectl create namespace demo
+namespace/demo created
+tmp@tmplab:~/forgeops$ kubens demo
+Context "minikube" modified.
+Active namespace is "demo".
+tmp@tmplab:~/forgeops$ cd charts
+tmp@tmplab:~/forgeops/charts$ cd scripts/
+tmp@tmplab:~/forgeops/charts/scripts$ ./install-prereqs 
+Secret agent not found.  Installing...
+namespace/secret-agent created
+Release "secret-agent" does not exist. Installing it now.
+Pulled: us-docker.pkg.dev/forgeops-public/charts/secret-agent:v1.2.0
+Digest: sha256:df54d10eee9fb59143a6ece22af45f24dc8c7dd52969644827340245e8a042a3
+NAME: secret-agent
+LAST DEPLOYED: Wed Mar 19 17:16:13 2025
+NAMESPACE: secret-agent
+STATUS: deployed
+REVISION: 1
+NOTES:
+secret-agent has been deployed successfully!
+Certificate manager not found.  Installing...
+namespace/cert-manager created
+Release "cert-manager" does not exist. Installing it now.
+NAME: cert-manager
+LAST DEPLOYED: Wed Mar 19 17:16:14 2025
+NAMESPACE: cert-manager
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+⚠️  WARNING: `installCRDs` is deprecated, use `crds.enabled` instead.
+cert-manager v1.17.1 has been deployed successfully!
+
+In order to begin issuing certificates, you will need to set up a ClusterIssuer
+or Issuer resource (for example, by creating a 'letsencrypt-staging' issuer).
+
+More information on the different types of issuers and how to configure them
+can be found in our documentation:
+
+https://cert-manager.io/docs/configuration/
+
+For information on how to configure cert-manager to automatically provision
+Certificates for Ingress resources, take a look at the `ingress-shim`
+documentation:
+
+https://cert-manager.io/docs/usage/ingress/
+NGINX Ingress not found.  Installing...
+namespace/ingress-nginx created
+Release "ingress-nginx" does not exist. Installing it now.
+NAME: ingress-nginx
+LAST DEPLOYED: Wed Mar 19 17:16:57 2025
+NAMESPACE: ingress-nginx
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The ingress-nginx controller has been installed.
+It may take a few minutes for the load balancer IP to be available.
+You can watch the status by running 'kubectl get service --namespace ingress-nginx ingress-nginx-controller --output wide --watch'
+
+An example Ingress that makes use of the controller:
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: example
+    namespace: foo
+  spec:
+    ingressClassName: nginx
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - pathType: Prefix
+              backend:
+                service:
+                  name: exampleService
+                  port:
+                    number: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+      - hosts:
+        - www.example.com
+        secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+tmp@tmplab:~/forgeops$ kubectl apply -f ./cluster/resources/minikube-fast-storage-class.yaml
+storageclass.storage.k8s.io/fast created
+tmp@tmplab:~/forgeops/charts/identity-platform$ helm upgrade --install identity-platform ./  --version 2025.1.1 --namespace demo  --values ../../helm/dev/values.yaml
+Release "identity-platform" does not exist. Installing it now.
+NAME: identity-platform
+LAST DEPLOYED: Wed Mar 19 17:21:55 2025
+NAMESPACE: demo
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+1. Get the application URL by running these commands:
+  https://forgeops.example.com/platform
+  https://forgeops.example.com/am
+  https://forgeops.example.com/admin
+  https://forgeops.example.com/enduser
+tmp@tmplab:~/forgeops/bin$ kubectl get pods
+NAME                           READY   STATUS      RESTARTS   AGE
+admin-ui-76c5f657c7-c28bn      1/1     Running     0          11m
+am-868546b98d-gfkk4            1/1     Running     0          11m
+amster-jgcdb                   0/1     Completed   0          11m
+ds-cts-0                       1/1     Running     0          11m
+ds-idrepo-0                    1/1     Running     0          11m
+end-user-ui-5d65b7f96b-x5rrc   1/1     Running     0          11m
+idm-5f98f75d4b-f5sx9           1/1     Running     0          11m
+login-ui-84c7fd65c7-j5xr7      1/1     Running     0          11m
